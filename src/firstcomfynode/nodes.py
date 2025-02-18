@@ -1,4 +1,7 @@
 from inspect import cleandoc
+import torch
+from torch import Tensor
+from typing import List
 class Example:
     """
     A example node
@@ -116,3 +119,19 @@ NODE_CLASS_MAPPINGS = {
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Example": "Example Node"
 }
+
+class ImageSelector:
+    CATEGORY = "example"
+    @classmethod    
+    def INPUT_TYPES(s):
+        return { "required":  { "images": ("IMAGE",), } }
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "choose_image"
+
+# select the brightest image among an image list
+def choose_image(self, images:List[Tensor]):
+    brightness = list(torch.mean(image.flatten().item() for image in images))
+    brightest = brightness.index(max(brightness))
+    result = images[brightest].unsqueeze(0)
+    return (result,)
+       
